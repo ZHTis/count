@@ -1,0 +1,29 @@
+strlist ={'pon2_s3c3','pon2_s3c2','pon2_s3c1',...
+    'pon2_s4c3','pon2_s4c2','pon2_s4c1',...
+    'pon1_s3c3','pon1_s3c2','pon1_s3c1',...
+    'pon1_s4c3','pon1_s4c2','pon1_s4c1',...
+    'pon0_s3c3','pon0_s3c2','pon0_s3c1',...
+    'pon0_s4c3','pon0_s4c2','pon0_s4c1',...
+    'pon4_s3c3','pon4_s3c2','pon4_s3c1',...
+    'pon4_s4c3','pon4_s4c2','pon4_s4c1',...
+    'pon3_s3c3','pon3_s3c2','pon3_s3c1',...
+    'pon3_s4c3','pon3_s4c2','pon3_s4c1'
+    }
+coeff_ampvel = []
+strlist2 = {'smog_0','smog_1','smog_2','smog_4'}
+
+for i = 1:numel(strlist2)
+    str = strlist2{i};
+    str2 = '.mat';
+    name = strcat(str, str2); 
+    data = load(name)
+    vel = data.data.saccade.peakVelocity
+    amp = data.data.saccade.amplitude
+    x = log(amp)
+    y= log(vel)
+    coefficients = polyfit(x,y,1)
+    coeff_= struct('str',str,'coefficients',coefficients)
+    coeff_ampvel = [coeff_ampvel,coeff_]
+end
+co_ampvel_tosave = struct2table(coeff_ampvel)
+writetable(co_ampvel_tosave,'coeff_ampvel_pon.txt')
