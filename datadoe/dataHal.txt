@@ -1,0 +1,46 @@
+import pandas as pd
+import ast
+
+# the data form is required to have no space at the beginning and nothing and the end,
+# and dicts should be separated with comma.
+
+path = '/Users/rubythurs/Documents/save_2023-10-14-11.36.22.csv'
+with open(path) as f:
+    data = f.read()
+    data2 = ast.literal_eval(data) #tuple
+
+dictx = []
+
+for item in data2:
+    if isinstance(item, dict):
+        dictx.append(item)
+
+print(type(dictx))
+pd.set_option('display.max_columns', 40)
+pd.set_option('display.max_rows',None)
+df = pd.DataFrame(dictx)
+
+# to see all the clicks(godot sample twice at one click) 
+df[df['click_pos']!=df.shift(-1)['click_pos']]
+# to see all different trails
+df_ = df[df['ini_pos']!=df.shift(-1)['ini_pos']]
+
+df_['response_time'] = df_['click_time']-df_['ini_time']
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import norm, expon, gamma
+
+# fit data into a distribution
+data = df_['response_time']
+params = norm.fit(data)
+mu, sigma = params
+print("mu =", mu, ", sigma =", sigma)
+
+# plot
+plt.hist(data, bins=30, density=True, alpha=0.5, label='Histogram')
+x = np.linspace(min(data), max(data))
+y = norm.pdf(x, loc=mu, scale=sigma)
+plt.plot(x, y, 'r', label='Normal Distribution')
+plt.legend()
+plt.show()
